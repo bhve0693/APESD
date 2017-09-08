@@ -1,5 +1,5 @@
 /*
-@Brief : Addition of Nodes in Double-Linked List with double pointer Implementation
+@Brief : Addition and Removal of Nodes in Double-Linked List with double pointer Implementation
 @Author: Bhallaji Venkatesan 
 @Purpose: Homework 1 Code for Advanced Practical Embedded Software Design
 @Mentor : Mr. Alex Fosdick, Instructor, The University of Colorado Boulder
@@ -72,7 +72,7 @@ uint8_t add_node(struct NODE **hdnode_ptr, uint32_t data, uint32_t index)
   {
  
     //No Head Case
-    if(*hdnode_ptr == NULL)
+    if(!(*hdnode_ptr))
     {
         new_node->next = NULL;
         new_node->prev = NULL;
@@ -124,6 +124,68 @@ uint8_t add_node(struct NODE **hdnode_ptr, uint32_t data, uint32_t index)
 }//Function
 
 
+uint8_t remove_node(struct NODE **hdnode_ptr, uint32_t index)
+{
+  struct NODE *new_node = (struct NODE *)malloc(sizeof(struct NODE));
+  struct NODE *temp,*temp_remove;
+
+  
+  
+  if(index > (global_index)) //Invalid Index
+     return 2;
+
+  else
+  {
+ 
+    //No Head Case
+    if(!(*hdnode_ptr))
+    {
+        return 1;
+    }
+  
+    //Removing Head Node
+    if(!index)
+    {
+        temp = (*hdnode_ptr)->next;
+        (*hdnode_ptr)->next = NULL;
+	*hdnode_ptr = temp;
+        global_index--;
+        return 0;
+    }
+    if(index == global_index) //Removing Node at Tail
+    {
+	
+        temp = *hdnode_ptr;
+        while(temp->next)
+        {
+	     temp = temp->next;	
+        }
+	temp->prev->next = NULL;
+	temp = NULL;
+        global_index--;
+        return 0; 
+    }
+    //Removing Any general Node
+    else
+    {  
+        temp = *hdnode_ptr;
+        while((index >=1))
+        {
+            temp=temp->next;
+            index--;
+        }
+
+        temp->next->prev = temp->prev;
+        temp->prev->next = temp->next;
+	temp->prev = NULL;
+	temp->next = NULL;
+        global_index--;
+        return 0;
+     }
+  }// Valid Index
+}//Function
+
+
 int main()
 {
 struct NODE *head =NULL;
@@ -156,7 +218,19 @@ status = add_node(&head,1,global_index/2);
 status = add_node(&head,2,global_index/2);
 status = add_node(&head,3,global_index/2);
 status = add_node(&head,4,global_index/2);
-
+status = remove_node(&head,0);
+status = remove_node(&head,0);
+status = remove_node(&head,0);
+status = remove_node(&head,0);
+status = remove_node(&head,0);
+status = remove_node(&head,0);
+status = remove_node(&head,global_index);
+status = remove_node(&head,global_index);
+status = remove_node(&head,global_index);
+status = remove_node(&head,global_index);
+status = remove_node(&head,global_index/2);
+status = remove_node(&head,global_index/2);
+status = remove_node(&head,global_index/2);
 temp = head; 
 while(temp)
 {

@@ -1,5 +1,5 @@
 /*
-@Brief : Addition and Removal of Nodes in Double-Linked List with double pointer Implementation
+@Brief : Addition, Removal of Nodes and searching a value in Double-Linked List with double pointer Implementation
 @Author: Bhallaji Venkatesan 
 @Purpose: Homework 1 Code for Advanced Practical Embedded Software Design
 @Mentor : Mr. Alex Fosdick, Instructor, The University of Colorado Boulder
@@ -185,6 +185,20 @@ uint8_t remove_node(struct NODE **hdnode_ptr, uint32_t index)
   }// Valid Index
 }//Function
 
+void search(struct NODE **node_ptr, uint32_t data, uint32_t *index)
+{
+  uint32_t temp_index =0;
+  struct NODE *temp;
+  temp = *node_ptr;
+  while(temp->element !=data)
+  {
+    temp= temp->next;
+    temp_index++;	
+  }
+  printf("Data %d is found at index %d \r\n",data,temp_index);
+  *index = temp_index;
+  
+}
 
 int main()
 {
@@ -192,6 +206,7 @@ struct NODE *head =NULL;
 struct NODE *temp;
 uint8_t status=0;
 uint8_t ind = 0;
+uint32_t search_index = 0;
 /*Test Code */
 status = add_node(&head,15,0); 
 status = add_node(&head,16,1); 
@@ -238,5 +253,10 @@ while(temp)
  ind++;
  temp =temp->next; 
 }
+
+search(&head,14,&search_index);
+search(&head,11,&search_index);
+search(&head,17,&search_index);
+printf("Search index value in main is %d",search_index);
 }
 

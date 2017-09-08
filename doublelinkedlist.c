@@ -28,7 +28,7 @@ enum STATUS{
 uint8_t destroy(struct NODE **hdnode_ptr);
 uint8_t add_node(struct NODE **hdnode_ptr, uint32_t data, uint32_t index);
 uint8_t remove_node(struct NODE **bsnode_ptr, uint32_t data, uint32_t index);
-void search(struct NODE **node_ptr, uint32_t data, uint32_t *index);
+uint8_t search(struct NODE **node_ptr, uint32_t data, uint32_t *index);
 uint32_t size(struct NODE **hdnode_ptr);
 */
 uint8_t destroy(struct NODE **hdnode_ptr)
@@ -184,19 +184,29 @@ uint8_t remove_node(struct NODE **hdnode_ptr, uint32_t index)
   // Valid Index
 }//Function
 
-void search(struct NODE **node_ptr, uint32_t data, uint32_t *index)
+uint8_t search(struct NODE **node_ptr, uint32_t data, uint32_t *index)
 {
   uint32_t temp_index =0;
+  if(!(*node_ptr))
+  {
+    return 2;
+  }
   struct NODE *temp;
   temp = *node_ptr;
+  
   while(temp->element !=data)
   {
     temp= temp->next;
+    if(!temp)
+    {
+       return 1;
+    } 
+    
     temp_index++;	
   }
   printf("Data %d is found at index %d \r\n",data,temp_index);
   *index = temp_index;
-  
+  return 0;
 }
 uint32_t size(struct NODE **hdnode_ptr)
 {
@@ -211,15 +221,118 @@ uint32_t size(struct NODE **hdnode_ptr)
  return (node_size+1);
   
 }
+void display(struct NODE *head)
+{
+  struct NODE *temp;
+  temp = head;
+  uint8_t status =0;
+  uint32_t index=0; 
+  while(temp)
+  {
+   printf("Data in Index %d is %d \r\n",index,temp->element);
+   index++;
+   temp =temp->next; 
+  }
+}
+
+void dll_menu()
+{
+   uint32_t nodeelement;
+   uint32_t node_size = 0;
+   uint32_t index;
+   uint32_t ch;
+   struct NODE *head = NULL;
+   uint8_t Err_code =0;
+   uint8_t status = 0;
+   //enum Errorcode Errorcode;
+    printf("Double Linked List Menu\n1.Add New Node\n2.Remove Node\n3.Search a node\n4.Size\n5.Destroy LL\n6.Exit\n Enter Your Choice(1-6)");
+	scanf("%u",&ch);
+        while(ch!=6)
+	{
+            switch(ch)
+	    {
+		case 1: printf("Enter a value:");
+				scanf("%u",&nodeelement);
+				printf("\nEnter the Index of new node to be added : ");
+				scanf("%u",&index);
+				Err_code = add_node(&head,nodeelement,index);
+				if(Err_code == 2) 
+				{
+					printf("Invalid Index !\n");
+					break;
+				}
+				if(Err_code == 0)
+				{
+					display(head);
+					break;
+				}
+			case 2: printf("\nEnter the Index of node to be removed : ");
+				scanf("%u",&index);
+				Err_code = remove_node(&head,index); 
+				if(Err_code == 2) 
+				{
+					printf("Invalid Index !\n");
+					break;
+				}
+				if(Err_code == 1)
+				{
+					printf("No LL to remove node from\n");
+					break;
+				}
+
+				if(Err_code == 0)
+				{
+					display(head);
+					break;
+				}
+
+			case 3: printf("\nEnter data to be searched : ");
+				scanf("%u",&nodeelement);
+				status = search(&head,nodeelement,&index);
+				if(status == 2)
+				{
+					printf("Empty DLL\n");
+					break;
+				}
+                                if(status == 1)
+                                {
+                                   printf("Data not Found!\n");
+					break;
+                                }
+				printf("Data found at index %u\n",index);
+				break;
+
+			case 4: node_size = size(&head);
+				printf("\nSize of List:%u\n",node_size);
+				break;
+
+			case 5: Err_code = destroy(&head);
+				if(Err_code == 1)
+				{
+					printf("\nDLL not available to destroy\n");
+					break;
+				}
+				if(Err_code == 0)
+				{
+					printf("\nDLL destroyed\n");
+					break;
+				}
+
+			case 6: exit(0);
+               }
+		printf("Double Linked List Menu\n1.Add New Node\n2.Remove Node\n3.Search a node\n4.Size\n5.Destroy LL\n6.Exit\n Enter Your Choice(1-6)");
+	scanf("%u",&ch);
+	
+	}
+}
+
 int main()
 {
-struct NODE *head =NULL;
-struct NODE *temp;
-uint8_t status=0;
-uint8_t ind = 0;
-uint32_t search_index = 0;
-uint32_t node_size =0;
+
+  dll_menu();
+  return 0;
 /*Test Code */
+/*
 status = add_node(&head,15,0); 
 status = add_node(&head,16,1); 
 status = add_node(&head,17,1); 
@@ -276,6 +389,6 @@ printf("Global Size %d \r\n", global_index);
 destroy(&head);
 status = remove_node(&head,2);
 printf("Status in remove node is %d \r\n",status);
-
+*/
 }
 

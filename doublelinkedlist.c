@@ -30,7 +30,7 @@ uint8_t add_node(struct NODE **hdnode_ptr, uint32_t data, uint32_t index);
 uint8_t remove_node(struct NODE **bsnode_ptr, uint32_t data, uint32_t index);
 void search(struct NODE **node_ptr, uint32_t data, uint32_t *index);
 uint32_t size(struct NODE **hdnode_ptr);
-
+*/
 uint8_t destroy(struct NODE **hdnode_ptr)
 {
  
@@ -39,7 +39,7 @@ struct NODE *temp = (struct NODE *)malloc(sizeof(struct NODE));
 
 if (!(*hdnode_ptr))
     return 1; /*if no nodes are present */
-/*
+
 else 
     {
          while(*hdnode_ptr)
@@ -53,7 +53,7 @@ else
 	 return 0;
      }
 }
-*/
+
 uint8_t add_node(struct NODE **hdnode_ptr, uint32_t data, uint32_t index)
 {
   struct NODE *new_node = (struct NODE *)malloc(sizeof(struct NODE));
@@ -68,9 +68,7 @@ uint8_t add_node(struct NODE **hdnode_ptr, uint32_t data, uint32_t index)
   if(index > (global_index+1)) //Invalid Index
      return 2;
 
-  else
-  {
- 
+
     //No Head Case
     if(!(*hdnode_ptr))
     {
@@ -120,7 +118,7 @@ uint8_t add_node(struct NODE **hdnode_ptr, uint32_t data, uint32_t index)
         global_index++;
         return 0;
      }
-  }// Valid Index
+  // Valid Index
 }//Function
 
 
@@ -129,20 +127,19 @@ uint8_t remove_node(struct NODE **hdnode_ptr, uint32_t index)
   struct NODE *new_node = (struct NODE *)malloc(sizeof(struct NODE));
   struct NODE *temp,*temp_remove;
 
-  
-  
-  if(index > (global_index)) //Invalid Index
-     return 2;
-
-  else
-  {
- 
-    //No Head Case
+      //No Head Case
     if(!(*hdnode_ptr))
     {
         return 1;
     }
   
+  
+  if(index > (global_index)) //Invalid Index
+     return 2;
+
+ 
+ 
+
     //Removing Head Node
     if(!index)
     {
@@ -184,7 +181,7 @@ uint8_t remove_node(struct NODE **hdnode_ptr, uint32_t index)
         global_index--;
         return 0;
      }
-  }// Valid Index
+  // Valid Index
 }//Function
 
 void search(struct NODE **node_ptr, uint32_t data, uint32_t *index)
@@ -276,5 +273,9 @@ printf("Search index value in main is %d\r\n",search_index);
 node_size = size(&head);
 printf("Size of the DLL is %d \r\n",node_size);
 printf("Global Size %d \r\n", global_index);
+destroy(&head);
+status = remove_node(&head,2);
+printf("Status in remove node is %d \r\n",status);
+
 }
 

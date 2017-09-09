@@ -1,15 +1,23 @@
+/***************************************************************************** 
+* Copyright (C) 2017 by Bhallaji Venkatesan 
+* Redistribution, modification or use of this software in source or binary 
+* forms is permitted as long as the files maintain this copyright. Users are 
+* permitted to modify this and use it to learn about double linked lists.
+* Bhallaji Venkatesan and the University of Colorado are not liable for 
+* any misuse of this material.  *****************************************************************************/ 
+/** 
+* @file dobulelinkedlist.h 
+* @brief  Includes function declartions for ADD, Remove node, search value, 
+*         size of dll and destroy actions for the double linked lists * 
+* @author Bhallaji Venkatesan 
+* @date September 8 2017 */
 
-#ifndef __DOUBLELINKEDLIST_H_INCLUDED
-#define __DOUBLELINKEDLIST_H_INCLUDED
+#ifndef __DOUBLELINKEDLIST_H_INCLUDED__
+#define __DOUBLELINKEDLIST_H_INCLUDED__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-
-
-
-/*** Global Variables ***/ 
-uint32_t global_index = 0;
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <stdint.h> 
 
 
 /***Global Structures ***/
@@ -117,6 +125,6 @@ enum Err_code search(struct NODE** hdnode_ptr,uint32_t data, uint32_t *index);
 ​ */
 uint32_t size(struct NODE **hdnode_ptr);
 
-//__DOUBLELINKEDLIST_H_INCLUDED
-#endif​ 
+
+#endif​ /*__DOUBLELINKEDLIST_H_INCLUDED__*/
 

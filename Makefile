@@ -1,5 +1,5 @@
 # @brief Makefile for compiling doublelinkedlist and circular buffer
-#        Folder structure -> Source Files in /src directory
+#        Folder structure -> Source Files in ~/APESD directory
 #                         -> Header Files in /inc directory 
 #                         -> Output executables in Makefile directory
 # @Author Bhallaji Venkatesan 
@@ -10,9 +10,8 @@ CC=gcc
 
 CFLAGS= -O0 -g -w $(INCLUDE_DIRS) 
 OUTPUT= cbuf dllist
-SOURCE_DIRS = src
 HFILES= circularbuffer.h doublelinkedlist.h
-CFILES= circualrbuffer.c doublelinkedlist.c
+CFILES= circularbuffer.c doublelinkedlist.c
 
 SRCS= ${HFILES} ${CFILES}
 OBJS= $(CFILES:.c=.o)
@@ -22,6 +21,7 @@ all:	${OUTPUT}
 clean:
 	-rm -f *.o *.NEW *~ *.d
 	-rm -f ${OUTPUT} ${GARBAGE}
+
 cbuf:circularbuffer.o
 	$(CC) $(CFLAGS) -o $@ circularbuffer.o $(LIBS)
 

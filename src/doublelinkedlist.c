@@ -176,6 +176,7 @@ enum Err_code remove_node(struct NODE **hdnode_ptr, uint32_t index)
 enum Err_code search(struct NODE **node_ptr, uint32_t data, uint32_t *index)
 {
   uint32_t temp_index =0;
+  *index =NULL;
   if(!(*node_ptr))
   {
     return ERR_DLL_EMPTY;
@@ -306,6 +307,8 @@ void dll_menu()
 	       }
 
        case 6: exit(0);
+       default: printf("Invalid Request. Please Request again! \r\n");
+                break;
      }
      printf("Double Linked List Menu\n1.Add New Node\n2.Remove Node\n3.Search a node\n");
      printf("4.Size\n5.Destroy LL\n6.Exit\n Enter Your Choice(1-6)");

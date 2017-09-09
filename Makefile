@@ -9,19 +9,21 @@ INCLUDE_DIRS = -Iinc
 CC=gcc
 
 CFLAGS= -O0 -g -w $(INCLUDE_DIRS) 
-OUTPUT= dllist
+OUTPUT= cbuf dllist
 SOURCE_DIRS = src
-HFILES= doublelinkedlist.h
-CFILES= doublelinkedlist.c
+HFILES= circularbuffer.h doublelinkedlist.h
+CFILES= circualrbuffer.c doublelinkedlist.c
 
-SRCS= ${HFILES} ${SOURCE_DIRS}/${CFILES}
-OBJS= ${SOURCE_DIRS}/doublelinkedlist.o
+SRCS= ${HFILES} ${CFILES}
+OBJS= $(CFILES:.c=.o)
 
 all:	${OUTPUT}
 
 clean:
 	-rm -f *.o *.NEW *~ *.d
 	-rm -f ${OUTPUT} ${GARBAGE}
+cbuf:circularbuffer.o
+	$(CC) $(CFLAGS) -o $@ circularbuffer.o $(LIBS)
 
 dllist:doublelinkedlist.o
 	$(CC) $(CFLAGS) -o $@ doublelinkedlist.o $(LIBS)

@@ -12,8 +12,8 @@
 * @author Bhallaji Venkatesan 
 * @date September 8 2017 */
 
-#ifndef __DOUBLELINKEDLIST_H_INCLUDED__
-#define __DOUBLELINKEDLIST_H_INCLUDED__
+#ifndef __DOUBLELINKEDLIST_H_INCLUDED
+#define __DOUBLELINKEDLIST_H_INCLUDED
 
 #include <stdio.h> 
 #include <stdlib.h> 
@@ -125,6 +125,4 @@ enum Err_code search(struct NODE** hdnode_ptr,uint32_t data, uint32_t *index);
 ​ */
 uint32_t size(struct NODE **hdnode_ptr);
 
-
-#endif​ /*__DOUBLELINKEDLIST_H_INCLUDED__*/
-
+#endif //__DOUBLELINKEDLIST_H_INCLUDED

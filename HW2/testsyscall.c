@@ -5,7 +5,7 @@
 #include<string.h>
 #include<err.h>
 
-#define sizer 20
+#define sizer 256
 
 void rand_input(int32_t *input, int size);
 void print_buffer(int32_t *buffer,int size);
@@ -57,9 +57,7 @@ int main()
    print_buffer(input_buffer,sizer);   
    printf("\n");
    //ltos_sort(input_buffer,output_buffer,sizer);
-  // output_buffer = NULL;
    int temp = 0;
-   input_buffer = NULL;
    long temp_return = 0;
    temp_return = syscall(333,input_buffer,sizer,output_buffer);
    if(!temp_return)

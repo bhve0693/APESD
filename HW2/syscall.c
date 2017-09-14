@@ -49,6 +49,7 @@ asmlinkage long sys_rand_sort(int32_t *input_buffer, int32_t size, int32_t *sort
    if(!input_buffer || !sorted_buffer || (size<=0) )
    {
      printk(KERN_ALERT "Error ID %d: Invalid Arguments \n",EINVAL);
+     printk(KERN_ALERT "Exiting Random Sort Syscall\n");
      return EINVAL;
    }
    
@@ -57,6 +58,7 @@ asmlinkage long sys_rand_sort(int32_t *input_buffer, int32_t size, int32_t *sort
    if(!in_kbuff || !out_kbuff)
    {
      printk(KERN_ALERT "Error ID %d: Unable to allocate Kernel Memory \n",EINVAL);
+     printk(KERN_ALERT "Exiting Random Sort Syscall\n");
      return EFAULT;
    }
    /*in_buff_error = PTR_ERR_OR_ZERO(input_buffer); 

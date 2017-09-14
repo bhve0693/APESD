@@ -4,19 +4,19 @@
 #include<linux/slab.h>
 #include<linux/gfp.h>
 #include<uapi/asm-generic/errno-base.h>
-void ltos_sort(int32_t *input, int32_t *output,int size)
+
+void ltos_sort(int32_t *input, int size)
 {
-   int outer,inner,temp = 0;
-   memcpy(output,input,(sizeof(int32_t)*size)); 
+   int outer,inner,temp = 0; 
    for(outer =0;outer<size;outer++)
    {
      for(inner = outer+1;inner<size;inner++)
      {
-       if(*(output+outer) < *(output+inner))
+       if(*(input+outer) < *(input+inner))
        { 
-	 temp = *(output+outer);
-         *(output+outer) = *(output+inner); 
-         *(output + inner) = temp;
+	 temp = *(input+outer);
+         *(input+outer) = *(input+inner); 
+         *(input + inner) = temp;
        }
       }
     }
@@ -34,11 +34,9 @@ void print_buffer(int32_t *buffer,int size)
    printk(KERN_ALERT "\n");
    
 }
-
-asmlinkage long sys_rand_sort(int32_t *input_buffer, int32_t size, int32_t *sorted_buffer)
+SYSCALL_DEFINE3(rand_sort,int32_t*,input_buffer,int32_t, size, int32_t*,sorted_buffer)
 {
    int32_t *in_kbuff = NULL;
-   int32_t *out_kbuff = NULL;
    //Validation of Input buffer and sorted buffer
    printk(KERN_ALERT "Enterning Random Sort Syscall\n");
    
@@ -54,8 +52,7 @@ asmlinkage long sys_rand_sort(int32_t *input_buffer, int32_t size, int32_t *sort
    }
    
    in_kbuff = kmalloc((sizeof(int32_t)*size),GFP_KERNEL);
-   out_kbuff = kmalloc((sizeof(int32_t)*size),GFP_KERNEL);
-   if(!in_kbuff || !out_kbuff)
+   if(!in_kbuff)
    {
      printk(KERN_ALERT "Error ID %d: Unable to allocate Kernel Memory \n",EINVAL);
      printk(KERN_ALERT "Exiting Random Sort Syscall\n");
@@ -74,15 +71,13 @@ asmlinkage long sys_rand_sort(int32_t *input_buffer, int32_t size, int32_t *sort
        return 0;   
    } */
    copy_from_user(in_kbuff,input_buffer,(sizeof(int32_t)*size));
-   printk(KERN_ALERT "Size of Buffer: %d /n",size);
+   printk(KERN_ALERT "Size of Buffer: %d \n",size);
    printk(KERN_ALERT "Starting the sort in Random Sort Syscall\n");
-   ltos_sort(input_buffer,out_kbuff,size);
+   ltos_sort(in_kbuff, size);
    printk(KERN_ALERT "End of sort in  Random Sort Syscall\n");
 
-   copy_to_user(sorted_buffer,out_kbuff,(sizeof(int32_t)*size));
+   copy_to_user(sorted_buffer,in_kbuff,(sizeof(int32_t)*size));
    
-   
-   printk(KERN_ALERT "Tested the New Random Sort Syscall\n");
    printk(KERN_ALERT "Exiting Random Sort Syscall\n");
    return 0;
 }

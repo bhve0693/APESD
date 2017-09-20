@@ -21,8 +21,8 @@ Steps Done :
 
 3. Added syscall.c. The system call was implemented with the macro 
    SYSCALL_DEFINE3(rand_sort,int32_t*,input_buffer,int32_t, size, int32_t*,sorted_buffer)
-   
-  4.Created the corresponding make-file and add the directory to core-y in the main kernel makefile
+
+4. Created the corresponding make-file and add the directory to core-y in the main kernel makefile
 
 5. Performed the folllowing commands at /linux 
    $sudo make -j4 (Compiling and building the kernel in a concurrent fashion)

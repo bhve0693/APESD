@@ -1,3 +1,18 @@
+/*
+
+* FileName        :    kern_modtest.c
+* Description     :    This file contains custom kernel module "Kern_modtest" that implements a timer
+                       that wakes up the kernel module every 500ms and prints out the count of timer 
+*                      execution.
+*                        
+* File Author Name:    Bhallaji Venkatesan 
+* Tools used      :    gcc, gedit
+* References      :    http://www.makelinux.net/ldd3/chp-7-sect-4
+*		       http://elixir.free-electrons.com/linux/v3.4/ident/msecs_to_jiffies
+*
+*
+*/
+
 #include <linux/module.h> 
 #include <linux/kernel.h> 
 #include <linux/init.h> 
@@ -12,7 +27,7 @@ struct timer_list k_timer;
 static long time_count_keep = 0;
 void _Timercallback(unsigned long data)
 {
-    /*Restarting the timer...*/
+    /*Restarting the timer*/
     time_count_keep++;
     mod_timer( &k_timer, jiffies + msecs_to_jiffies(k_time_interval));
 
@@ -24,7 +39,7 @@ static int __init kernmod_init(void)
 
     printk(KERN_ALERT "Custom Kernel module installed in the kernel!.\n");
 
-    /*Starting the timer.*/
+    /*Starting the timer*/
     init_timer(&k_timer);
     k_timer.data = 0;
     k_timer.function = _Timercallback;

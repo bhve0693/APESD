@@ -1,3 +1,5 @@
+#Makefile referenced from https://github.com/afosdick/ecen5013/tree/develop/tutorials/unit_tests
+
 CC = cc
 CFLAGS = -std=c99 -Wall -Werror -g -O0
 

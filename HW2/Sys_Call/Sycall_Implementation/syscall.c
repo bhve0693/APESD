@@ -9,7 +9,7 @@
                         
 * File Author Name:    Bhallaji Venkatesan 
 * Tools used      :    gcc, gedit
-* References      :    https://github.com/afosdick/ecen5013/tree/develop/tutorials/unit_tests
+* References      :    ECEN 5013 Advanced Practical Embedded Software Class Lecture notes
 
 */
 
@@ -54,18 +54,19 @@ void ltos_sort(int32_t *input, int size)
     }
 }
 
-void print_buffer(int32_t *buffer,int size)
-{
-   int i =0;
-   for (i=0;i<size;i++)
-   {
-    printk(KERN_ALERT "%d",*(buffer+i));
-    printk(KERN_ALERT " ");
-   }
-   
-   printk(KERN_ALERT "\n");
-   
-}
+
+/**
+​ * ​ ​ @brief​ : System Call Function to sort userspace input buffer in the order of 
+ *            large to small and perform sanity checks on the the input buffer pointer
+​ *
+​ * ​ ​ Returns. 0 if success or (long) error code macro otherwise 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ input_buffer  ​ A pointer to the input buffer to be sorted
+ *           size           Size of the input buffer to be sorted
+​ *           sorted_buffer  A pointer to the userspace sorted buffer
+​ * ​ ​ @return​ ​ 0 or (long) errorcode
+​ */
 
 SYSCALL_DEFINE3(rand_sort,int32_t*,input_buffer,int32_t, size, int32_t*,sorted_buffer)
 {
@@ -73,10 +74,10 @@ SYSCALL_DEFINE3(rand_sort,int32_t*,input_buffer,int32_t, size, int32_t*,sorted_b
    unsigned long status = 0;
    printk(KERN_ALERT "Entering Random Sort Syscall\n");
    
-   /* Checking if the input parameters are valid */
-   if(!input_buffer || !sorted_buffer || (size<=0) )
+   /* Checking if the input parameters are valid. Minimum Size of Buffer should be 256 */
+   if(!input_buffer || !sorted_buffer || (size<256) )
    {
-     printk(KERN_ALERT "Error ID %d: Invalid Arguments \n",EINVAL);
+     printk(KERN_ALERT "Error ID %d: Invalid Input Arguments \n",EINVAL);
      printk(KERN_ALERT "Exiting Random Sort Syscall\n");
      return EINVAL;
    }
@@ -93,7 +94,7 @@ SYSCALL_DEFINE3(rand_sort,int32_t*,input_buffer,int32_t, size, int32_t*,sorted_b
    /* Copying User Space buffer to Kernel Space buffer and performing Sanity check
       on the operation. This involves checking if the input buffer points to a valid 
       userspace memory and destination buffer is a valid kernel space buffer*/
-   status = copy_from_user(input_buffer,in_kbuff,(sizeof(int32_t)*size));
+   status = copy_from_user(in_kbuff,input_buffer,(sizeof(int32_t)*size));
    if(status !=0)
    { 
      if(status == (sizeof(int32_t)*size))

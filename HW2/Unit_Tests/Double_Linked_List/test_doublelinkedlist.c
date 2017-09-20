@@ -22,7 +22,18 @@
 
 #include "doublelinkedlist.h"
 
-
+/**
+​ * ​ ​ @brief​ : Test Function to test addition at head of
+ *            the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state  ​ double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 
 void test_add_head_dll(void **state)
 {
@@ -35,6 +46,19 @@ void test_add_head_dll(void **state)
   assert_int_equal(status2, SUCCESS);
 
 }
+
+/**
+​ * ​ ​ @brief​ : Test Function to test addition at middle of
+ *            the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state  ​ double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 
 void test_add_middle_dll(void **state)
 {
@@ -60,6 +84,18 @@ void test_add_middle_dll(void **state)
 }
 
 
+/**
+​ * ​ ​ @brief​ : Test Function to test addition at tail of
+ *            the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state  ​ double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 
 void test_add_tail_dll(void **state)
 {
@@ -85,6 +121,19 @@ void test_add_tail_dll(void **state)
   assert_int_equal(status2, SUCCESS);
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test addition at an invalid
+ *            index of the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state  ​ double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 void test_add_bad_index(void **state)
 {
   enum Err_code status2;
@@ -95,6 +144,18 @@ void test_add_bad_index(void **state)
   assert_int_equal(status2, ERR_INVALID_INDEX);
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test removal at head of the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state  ​ double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 void test_remove_head_dll(void **state)
 {
   enum Err_code status2;
@@ -108,6 +169,19 @@ void test_remove_head_dll(void **state)
   assert_int_equal(status2, SUCCESS);
 
 }
+
+/**
+​ * ​ ​ @brief​ : Test Function to test removal at the tail
+ *            of the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 
 void test_remove_tail_dll(void **state)
 {
@@ -132,6 +206,19 @@ void test_remove_tail_dll(void **state)
 
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test removal at the middle
+ *            of the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 void test_remove_middle_dll(void **state)
 {
   enum Err_code status2;
@@ -155,6 +242,20 @@ void test_remove_middle_dll(void **state)
   assert_int_equal(status2, SUCCESS);
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test removal at the invalid
+ *            index of the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
+
 void test_remove_bad_index(void **state)
 {
   enum Err_code status2;
@@ -169,6 +270,19 @@ void test_remove_bad_index(void **state)
   destroy(&head_tail);
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test removal an empty
+ *            double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 void test_remove_empty_list(void **state)
 {
   enum Err_code status2;
@@ -179,6 +293,19 @@ void test_remove_empty_list(void **state)
   destroy(&head_tail);
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test destroy 
+ *            of a valid double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 void test_destroy_pass_dll(void **state)
 {
   enum Err_code status2;
@@ -192,6 +319,19 @@ void test_destroy_pass_dll(void **state)
 
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test destroy an invalid
+ *            double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 void test_destroy_fail_dll(void **state)
 {
   enum Err_code status2;
@@ -200,6 +340,19 @@ void test_destroy_fail_dll(void **state)
   assert_int_equal(status2, ERR_DLL_EMPTY);
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test search of an element
+ *            of the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 void test_search_pass_dll(void **state)
 {
   enum Err_code status2;
@@ -225,6 +378,20 @@ void test_search_pass_dll(void **state)
   
 }
 
+
+/**
+​ * ​ ​ @brief​ : Test Function to test search of an invalid element
+ *            of the double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
+
 void test_search_invdata_dll(void **state)
 {
   enum Err_code status2;
@@ -248,6 +415,19 @@ void test_search_invdata_dll(void **state)
   assert_int_equal(status2,ERR_DATA_NOT_FOUND);
   destroy(&head_mid);
 }
+
+/**
+​ * ​ ​ @brief​ : Test Function to test search an empty
+ *            double linked list
+​ *
+​ * ​ ​ No Returns. 
+​ * ​ ​
+​ *
+​ * ​ ​ @param​ ​ state double pointer to a state machine
+ *           
+​ *
+​ * ​ ​ @return​ ​ None
+​ */
 
 void test_search_empty_dll(void **state)
 {

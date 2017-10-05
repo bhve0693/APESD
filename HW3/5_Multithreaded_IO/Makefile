@@ -6,9 +6,9 @@
 CC=gcc
 
 CFLAGS= -O0 -g -w -pthread
-OUTPUT= multithreaded_io
+OUTPUT= multhread_legacy
 
-CFILES= multithreaded_io.c
+CFILES= multhread_legacy.c
 
 SRCS= ${CFILES}
 OBJS= $(CFILES:.c=.o)
@@ -20,8 +20,8 @@ clean:
 	-rm -f ${OUTPUT} ${GARBAGE}
 
 
-multithreaded_io:multithreaded_io.o
-	$(CC) $(CFLAGS) -o $@ multithreaded_io.o $(LIBS)
+multhread_legacy:multhread_legacy.o
+	$(CC) $(CFLAGS) -o $@ multhread_legacy.o $(LIBS)
 
 
 .c.o:

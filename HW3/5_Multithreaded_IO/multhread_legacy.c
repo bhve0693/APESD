@@ -20,7 +20,16 @@
 #define WRITE_THREAD  0
 #define READ_THREAD   1
 #define REPORT_THREAD 2
-#define MAX_FILENAME_SIZE 40
+#define DEFAULT 	  3
+#define MAX_FILENAME_SIZE 50
+#define SIG1_NOT_DONE 0
+#define SIG1_DONE 1
+#define MAIN_THREAD_PROCESSING 2
+#define MAIN_THREAD_PROCESSING_DONE 3
+#define READ_THREAD_WAITING 4
+
+int sig_status = MAIN_THREAD_PROCESSING;
+
 
 static volatile sig_atomic_t flag = WRITE_THREAD;
 void signal_handler(int signal);
@@ -41,11 +50,31 @@ void signal_handler(int signal)
 	switch (signal)
 	{
     	case SIGUSR1:
-        	flag = READ_THREAD;
+    	    if(sig_status == MAIN_THREAD_PROCESSING_DONE)
+    	    {
+        		flag = READ_THREAD;
+        		sig_status = SIG1_DONE;
+            }
+            else
+            {
+            	sig_status = READ_THREAD_WAITING;
+            	printf("\nWaiting for Write thread to be finished. Try sending SIGUSR1 at a later point\n");
+            }
         	break;
 
         case SIGUSR2: 
-        	flag = REPORT_THREAD;
+        	if(sig_status == SIG1_DONE)
+        	{
+        		flag = REPORT_THREAD;
+       		}
+       		else if(sig_status == MAIN_THREAD_PROCESSING || sig_status == READ_THREAD_WAITING)
+       		{
+       			printf("\n Thread1 still processing! Report not Ready!\n");
+       		}
+       		else
+       		{
+       			printf("\n SIGUSR1 not yet received! Report not Ready!\n");
+       		}
         	break;
         default:
         	break;
@@ -56,6 +85,7 @@ void signal_handler(int signal)
 void *f_write(void *arg)
 {
 	//pthread_mutex_lock( &mutex );
+	FILE *fp;
 	while(1)
 	{
 		if(flag == WRITE_THREAD)
@@ -65,25 +95,28 @@ void *f_write(void *arg)
 			//long d = (long)(arg);
 			//printf("\n Long is %ld\n",d); 
 			struct shared_datastruct *input = (struct shared_datastruct *)arg;
-			char *temp_buff = malloc(sizeof(char)*1024);
+			//char *temp_buff = malloc(sizeof(char)*1024);
 			//char **new_file = (char **)arg;
 			printf("Enter the contens to be written into the file\n");
-	    	fgets(temp_buff, 1024*sizeof(char),stdin);
-	    	printf("\n temp buff is %s \n", temp_buff);
-	    	printf("strlen is %d", strlen(temp_buff));
-	    	printf("Size of tempbuff is %ld and size of char is %ld\n", sizeof(temp_buff), sizeof(char));
-	  		FILE *fp;
+	    	//fgets(temp_buff, 1024*sizeof(char),stdin);
+	    	//printf("\n temp buff is %s \n", temp_buff);
+	    	//printf("strlen is %d", strlen(temp_buff));
+	    	//printf("Size of tempbuff is %ld and size of char is %ld\n", sizeof(temp_buff), sizeof(char));
+	  		
+	  		char input_buff;
 	  		fp = fopen(input->filename, "w+");
-	  		fwrite(temp_buff, 1, strlen(temp_buff)*sizeof(char),fp);
+	  		while((input_buff = fgetc(stdin)) != '#')
+	  		{
+	  			fputc(input_buff, fp);
+	  		}
+	  		//fwrite(temp_buff, 1, strlen(temp_buff)*sizeof(char),fp);
 
 	  		/*for(int i = 2; i<argc; i++)
 	  		{
-
 	  			fwrite(argv[i], 1, sizeof(argv[i])*sizeof(char),fp);
-
 		    }*/
 	    	fclose(fp);
-	    	fp = fopen(input->filename, "r+");
+	    	/*fp = fopen(input->filename, "r+");
 	    	file_size = strlen(temp_buff);
 	    	char *buff = malloc(strlen(temp_buff)*sizeof(char));
 	    	while(!feof(fp))
@@ -92,13 +125,19 @@ void *f_write(void *arg)
 	    	}
 	    	printf("File size in write thread is %ld \n", file_size);
 	    	printf("\nBuff is %s\n",buff);
-	    	fclose(fp);
+	    	fclose(fp);*/
 	    	//pthread_cond_signal( &cond ); 
 	   		//pthread_mutex_unlock( & mutex );
 	   		//kill(getpid(),SIGUSR1);
 	   		break;
 		}
+		if(sig_status == READ_THREAD_WAITING)
+		{
+			fclose(fp);
+			break;
+		}
 	}	
+	sig_status = MAIN_THREAD_PROCESSING_DONE;
     return NULL;
   //  pthread_exit(NULL);
 
@@ -168,12 +207,15 @@ void *f_report(void *arg)
 	{
 		if(flag == REPORT_THREAD)
 		{
-			printf("\nEntering Report Thread \n");
-			struct shared_datastruct *report = (struct shared_datastruct *)arg;
-			printf("\nCharacter Count is %d\n",(report->count_char)-1);
-		    printf("\nWord Count is %d\n",report->count_word);
-		    printf("\nLine Count is %d\n",report->count_line);
-		    break;
+			if(sig_status == SIG1_DONE)
+			{
+				printf("\nEntering Report Thread \n");
+				struct shared_datastruct *report = (struct shared_datastruct *)arg;
+				printf("\nCharacter Count is %d\n",(report->count_char)-1);
+		    	printf("\nWord Count is %d\n",report->count_word);
+		    	printf("\nLine Count is %d\n",report->count_line);
+		    	break;
+		    }
 		}
 	}
 	return NULL;
@@ -224,9 +266,9 @@ int main(int argc , char **argv)
     pthread_create(&thread_fread, NULL, &f_read, &report);
     pthread_create(&thread_report, NULL, &f_report, &report);
     pthread_join(thread_fwrite, NULL);
-    pthread_kill(thread_fread, SIGUSR1);
+    //pthread_kill(thread_fread, SIGUSR1);
     pthread_join(thread_fread, NULL);
-    pthread_kill(thread_report, SIGUSR2);
+    //pthread_kill(thread_report, SIGUSR2);
     pthread_join(thread_report, NULL);
   	pthread_exit(NULL);
 
@@ -238,12 +280,9 @@ int main(int argc , char **argv)
   	FILE *fp;
   	fp = fopen(new_file, "w+");
   	fwrite(temp_buff, 1, strlen(temp_buff)*sizeof(char),fp);
-
   	/*for(int i = 2; i<argc; i++)
   	{
-
   		fwrite(argv[i], 1, sizeof(argv[i])*sizeof(char),fp);
-
     }*/
   /*  fclose(fp);
     fp = fopen(new_file, "r+");

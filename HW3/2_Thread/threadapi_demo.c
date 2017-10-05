@@ -1,7 +1,7 @@
 /*
-* FileName        :    kern_ll_process_traverse.c
-* Description     :    This file contains implementation that uses create, join, exit, self, 
-			  		   getattr, getattr_default, setattr, mutex_init, mutex_destroy, 
+* FileName        :    threadapi_demo.c
+* Description     :    This file contains implementation that uses create, join, exit,
+					   self, getattr, getattr_default, setattr, mutex_init, mutex_destroy, 
 			           mutex_lock, mutex_trylock,cond_init, cond_signal, cond_wait 
 			           and cond_destroy api's of pthreads to generate a random input
 			           buffer, and sort it. 

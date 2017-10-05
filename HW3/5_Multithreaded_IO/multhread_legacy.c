@@ -43,27 +43,30 @@ struct shared_datastruct{
 
 long file_size = 0;
 
-
 void signal_handler(int signal)
 {   
 	printf("\nEntering Here\n");
 	switch (signal)
 	{
     	case SIGUSR1:
-    	    if(sig_status == MAIN_THREAD_PROCESSING_DONE)
+    	    if(sig_status == MAIN_THREAD_PROCESSING_DONE || sig_status == SIG1_DONE) //waiting on main thread to gracefully complete
     	    {
         		flag = READ_THREAD;
         		sig_status = SIG1_DONE;
             }
-            else
+            else if(sig_status == MAIN_THREAD_PROCESSING)
             {
             	sig_status = READ_THREAD_WAITING;
-            	printf("\nWaiting for Write thread to be finished. Try sending SIGUSR1 at a later point\n");
+            	printf("\nWaiting for Write thread to be finished.Press '#' to end write thread and try sending SIGUSR1 at a later point\n");
+            }
+            else
+            {
+            	printf("\nRead Thread already processed! Try SIGUSR2 for report statistics\n");
             }
         	break;
 
         case SIGUSR2: 
-        	if(sig_status == SIG1_DONE)
+        	if(sig_status == SIG1_DONE) //Waiting for report thread to gracefully complete
         	{
         		flag = REPORT_THREAD;
        		}
@@ -77,6 +80,7 @@ void signal_handler(int signal)
        		}
         	break;
         default:
+        	//Do Nothing
         	break;
 
 	}
@@ -85,6 +89,11 @@ void signal_handler(int signal)
 void *f_write(void *arg)
 {
 	//pthread_mutex_lock( &mutex );
+	if(!arg)
+	{
+		printf("\nERR:Invalid Arguments to thread\n");
+		pthread_exit(NULL);
+	}
 	FILE *fp;
 	while(1)
 	{
@@ -97,14 +106,18 @@ void *f_write(void *arg)
 			struct shared_datastruct *input = (struct shared_datastruct *)arg;
 			//char *temp_buff = malloc(sizeof(char)*1024);
 			//char **new_file = (char **)arg;
-			printf("Enter the contens to be written into the file\n");
+			printf("Enter the contens to be written into the file (To Terminate contents, enter '#' in a new line)\n");
 	    	//fgets(temp_buff, 1024*sizeof(char),stdin);
 	    	//printf("\n temp buff is %s \n", temp_buff);
 	    	//printf("strlen is %d", strlen(temp_buff));
 	    	//printf("Size of tempbuff is %ld and size of char is %ld\n", sizeof(temp_buff), sizeof(char));
 	  		
 	  		char input_buff;
-	  		fp = fopen(input->filename, "w+");
+	  		if(!(fp = fopen(input->filename, "w+")))
+	  		{
+	  			printf("\nERR:File open failed\n");
+	  			pthread_exit(NULL);
+	  		}
 	  		while((input_buff = fgetc(stdin)) != '#')
 	  		{
 	  			fputc(input_buff, fp);
@@ -116,19 +129,7 @@ void *f_write(void *arg)
 	  			fwrite(argv[i], 1, sizeof(argv[i])*sizeof(char),fp);
 		    }*/
 	    	fclose(fp);
-	    	/*fp = fopen(input->filename, "r+");
-	    	file_size = strlen(temp_buff);
-	    	char *buff = malloc(strlen(temp_buff)*sizeof(char));
-	    	while(!feof(fp))
-	    	{
-	    		fread(buff, 1,strlen(temp_buff)*sizeof(char),fp);
-	    	}
-	    	printf("File size in write thread is %ld \n", file_size);
-	    	printf("\nBuff is %s\n",buff);
-	    	fclose(fp);*/
-	    	//pthread_cond_signal( &cond ); 
-	   		//pthread_mutex_unlock( & mutex );
-	   		//kill(getpid(),SIGUSR1);
+
 	   		break;
 		}
 		if(sig_status == READ_THREAD_WAITING)
@@ -147,6 +148,11 @@ void *f_read(void *arg)
 {
 	//pthread_mutex_lock( &mutex );
 	//pthread_cond_wait( & cond, & mutex ); 
+	if(!arg)
+	{
+		printf("\nERR:Invalid Arguments to thread\n");
+		pthread_exit(NULL);
+	}
 
 	while(1)
 	{
@@ -154,21 +160,18 @@ void *f_read(void *arg)
 		{
 			printf("\nEntering Read Thread \n");
 			struct shared_datastruct *report = (struct shared_datastruct *)arg;
-			//main_struct = (shared_datastruct *)arg;
-			//char **new_file = (char **)arg;
-		//char new_file[] = {"testing.txt"};
-			//memcpy(main_struct.filename,argv[1],strlen(argv[1])*sizeof(char));
 			char ch;
 			int count_line, count_char, count_word;
 			report->count_line = 0;
 			report->count_char = 0;
 			report->count_word = 0;
 	    	FILE *fp;
-	  		fp = fopen(report->filename, "r+");
-		    //printf("\nvalue of fp is %ld",fp);
-		  	
-		  	//printf("File size is %d" , file_size);
-		  	//char *buff = malloc(file_size*sizeof(char));
+	  		if(!(fp = fopen(report->filename, "r+"))) 
+	  		{
+	  			printf("\nERR:File open failed\n");
+	  			pthread_exit(NULL);
+	  		}
+
 		    while((ch = getc(fp)) != EOF)
 		    {
 		    	
@@ -184,9 +187,8 @@ void *f_read(void *arg)
 		    	{
 		    		report->count_line++;
 		    	}
-		    	//fread(buff, 1,file_size*sizeof(char),fp);
 		    }
-		    //printf("\nBuff is %s\n",buff);
+
 		    printf("\nCharacter Count is %d\n",(report->count_char)-1);
 		    printf("\nWord Count is %d\n",report->count_word);
 		    printf("\nLine Count is %d\n",report->count_line);
@@ -203,6 +205,11 @@ void *f_read(void *arg)
 
 void *f_report(void *arg)
 {
+	if(!arg)
+	{
+		printf("\nERR:Invalid Arguments to thread\n");
+		pthread_exit(NULL);
+	}
 	while(1)
 	{
 		if(flag == REPORT_THREAD)
@@ -231,67 +238,87 @@ int main(int argc , char **argv)
   	}
 	struct sigaction custom_signal;
 	struct shared_datastruct report;
+	pthread_attr_t attr;
+	pthread_t thread_fwrite,thread_fread,thread_report;
 
-	char filename[MAX_FILENAME_SIZE];
 	report.count_char = 0;
 	report.count_word = 0;
 	report.count_line = 0;
 	report.filename = malloc(50 *sizeof(char));
+
 	if(!report.filename)
 	{
-		printf("\nMalloc Failed\n");
-		exit(0);
+		printf("\nERR:Malloc Failed\n");
+		return 1;
 	}
-	pthread_attr_t attr;
-	pthread_t thread_fwrite,thread_fread,thread_report;
+
 	printf("Current Process ID is %d \n",getpid());
-  	memcpy(report.filename,argv[1],strlen(argv[1]));
-    long a =10;
+  	if(!memcpy(report.filename,argv[1],strlen(argv[1])))
+  	{
+  		printf("\nERR:Memcpy Failed!\n");
+		return 1;
+  	}
+
     custom_signal.sa_handler = signal_handler;
-    sigfillset(&custom_signal.sa_mask);
+
+    if(sigfillset(&custom_signal.sa_mask) == -1)
+    {
+    	printf("\nERR:Signal Mask Setting Failed!\n");
+		return 1;
+    }
     if(sigaction(SIGUSR1, &custom_signal, NULL) == -1)
     {
-    	printf("\\n Cannot Handle SIGUSR1\n");
+    	printf("\nERR:Cannot Handle SIGUSR1!\n");
+    	return 1;
     }
 
     if(sigaction(SIGUSR2, &custom_signal, NULL) == -1)
     {
-    	printf("\\n Cannot Handle SIGUSR2\n");
+    	printf("\nERR:Cannot Handle SIGUSR2!\n");
+    	return 1;
     }
-  //	char **new_file = argv[1];
+
   	pthread_attr_init(&attr);
-  	printf("\nargv 1 length is %d\n",strlen(argv[1]));
-  	pthread_create(&thread_fwrite, NULL, &f_write, &report);
+
+  	if(pthread_create(&thread_fwrite, NULL, &f_write, &report))
+  	{
+  		printf("\nERR:Thread Creation Failed!\n");
+    	return 1;
+  	}
     //pthread_join(thread_fwrite, NULL);
-    pthread_create(&thread_fread, NULL, &f_read, &report);
-    pthread_create(&thread_report, NULL, &f_report, &report);
-    pthread_join(thread_fwrite, NULL);
+    
+    if(pthread_create(&thread_fread, NULL, &f_read, &report))
+    {
+  		printf("\nERR:Thread Creation Failed!\n");
+    	return 1;
+  	}	
+    if(pthread_create(&thread_report, NULL, &f_report, &report))
+	{
+  		printf("\nERR:Thread Creation Failed!\n");
+    	return 1;
+  	}
+
+    if(pthread_join(thread_fwrite, NULL) != 0)
+	{
+  		printf("\nERR:Thread Joining Failed!\n");
+    	return 1;
+  	}
     //pthread_kill(thread_fread, SIGUSR1);
-    pthread_join(thread_fread, NULL);
+    if(pthread_join(thread_fread, NULL) != 0)
+    {
+  		printf("\nERR:Thread Joining Failed!\n");
+    	return 1;
+  	}
     //pthread_kill(thread_report, SIGUSR2);
-    pthread_join(thread_report, NULL);
+
+    if(pthread_join(thread_report, NULL) != 0)
+    {	
+    	printf("\nERR:Thread Joining Failed!\n");
+    	return 1;
+    }
+
+    /* pthread_exit always succeeds */
   	pthread_exit(NULL);
 
-  /*	printf("Enter the contens to be written into the file\n");
-    fgets(temp_buff, 1024*sizeof(char),stdin);
-    printf("\n temp buff is %s \n", temp_buff);
-    printf("strlen is %d", strlen(temp_buff));
-    printf("Size of tempbuff is %ld and size of char is %ld\n", sizeof(temp_buff), sizeof(char));
-  	FILE *fp;
-  	fp = fopen(new_file, "w+");
-  	fwrite(temp_buff, 1, strlen(temp_buff)*sizeof(char),fp);
-  	/*for(int i = 2; i<argc; i++)
-  	{
-  		fwrite(argv[i], 1, sizeof(argv[i])*sizeof(char),fp);
-    }*/
-  /*  fclose(fp);
-    fp = fopen(new_file, "r+");
-    char *buff = malloc(strlen(temp_buff)*sizeof(char));
-    while(!feof(fp))
-    {
-    	fread(buff, strlen(temp_buff)*sizeof(char),1,fp);
-    }
-    printf("\nBuff is %s\n",buff);
-    fclose(fp);*/
     return 0;
 }

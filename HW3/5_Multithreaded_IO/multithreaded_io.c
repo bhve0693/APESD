@@ -29,7 +29,7 @@ struct shared_datastruct{
 	int count_char;	
 	int count_word;	
 	int count_line;
-	char filename[MAX_FILENAME_SIZE];
+	char *filename;
 };
 
 long file_size = 0;
@@ -194,11 +194,16 @@ int main(int argc , char **argv)
 	report.count_char = 0;
 	report.count_word = 0;
 	report.count_line = 0;
-
+	report.filename = malloc(50 *sizeof(char));
+	if(!report.filename)
+	{
+		printf("\nMalloc Failed\n");
+		exit(0);
+	}
 	pthread_attr_t attr;
 	pthread_t thread_fwrite,thread_fread,thread_report;
 	printf("Current Process ID is %d \n",getpid());
-  	memcpy(report.filename,argv[1],strlen(argv[1])*sizeof(char));
+  	memcpy(report.filename,argv[1],strlen(argv[1]));
     long a =10;
     custom_signal.sa_handler = signal_handler;
     sigfillset(&custom_signal.sa_mask);

@@ -1,12 +1,12 @@
-# @brief Makefile for compiling threadapi_demo.c SW to test pthreads and kthreads api's
+# @brief Makefile for compiling threadapi_demo.c SW to test pthreads api's
 # @Author Bhallaji Venkatesan 
 # @Reference http://ecee.colorado.edu/~ecen5623/ecen/ex/Linux/Linux_TCP_Examples/Makefile
 
 
 CC=gcc
 
-CFLAGS= -O0 -g -w -pthreads
-OUTPUT= thread
+CFLAGS= -O0 -g -w -pthread
+OUTPUT= threadapi_demo
 
 CFILES= threadapi_demo.c
 

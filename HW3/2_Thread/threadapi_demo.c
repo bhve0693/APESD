@@ -132,6 +132,7 @@ int main()
 // Condition Thread 2 after array generation
   int i =0;
   int result = 0;
+  long long stacksize=0;
   int *buffer = malloc(100*sizeof(int));
   if(!buffer)
   {
@@ -140,6 +141,13 @@ int main()
   }
   pthread_t rinput_thread,sort_thread;
   pthread_attr_t attr;
+  printf("Enter stack size(greate than or equal to 0:)");
+  scanf("%lld",&stacksize);
+  if(stacksize>=0)
+  {
+    result = pthread_attr_setstacksize(&attr,stacksize);
+    if(result) printf("Error in setting stack size\n");
+  }
   pthread_mutex_init(&mutex,NULL);
   pthread_cond_init(&cond,NULL);
   //pthread_attr_init(&attr);

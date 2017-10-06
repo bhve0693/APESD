@@ -24,7 +24,7 @@ int main(int argc , char **argv)
 	end_time = clock();
 	printf("\nEntering Child Process\n");
 	printf("\n Argument is %s\n",argv[1]);
-	double argument = atof(argv[1],NULL);
+	double argument = atof(argv[1]);
 	printf("\nStart time of clock is %lu\n",argument);
 	printf("\nEnd time of clock is %lu\n",end_time);
 

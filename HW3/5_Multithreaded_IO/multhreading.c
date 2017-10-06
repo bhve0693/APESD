@@ -1,5 +1,5 @@
 /*
-* FileName        :    multithreaded_io.c
+* FileName        :    multhreading.c
 * Description     :    This file contains multithreaded file I/O implementation 
 *                        
 * File Author Name:    Bhallaji Venkatesan 

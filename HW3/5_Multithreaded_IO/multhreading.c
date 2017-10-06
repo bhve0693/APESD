@@ -18,11 +18,12 @@
 #include <unistd.h>
 #include <signal.h>
 
+
+/* Macros */
 #define WRITE_THREAD  0
 #define READ_THREAD   1
 #define REPORT_THREAD 2
 #define DEFAULT 	  3
-#define MAX_FILENAME_SIZE 50
 #define SIG1_NOT_DONE 0
 #define SIG1_DONE 1
 #define MAIN_THREAD_PROCESSING 2
@@ -43,10 +44,11 @@ struct shared_datastruct{
 };
 
 long file_size = 0;
+FILE *fp = NULL;
 
 void signal_handler(int signal)
 {   
-	printf("\nEntering Here\n");
+	printf("\nEntering Signal Handler!\n");
 	switch (signal)
 	{
     	case SIGUSR1:
@@ -80,8 +82,11 @@ void signal_handler(int signal)
        			printf("\n SIGUSR1 not yet received! Report not Ready!\n");
        		}
         	break;
-       	case SIGINT:
-       		printf("\ncoming here\n");
+
+       	case SIGINT: 
+       		printf("\nReceived SIGINT, proceeding to gracefully exit parent and child!\n");
+       		if(fp != NULL)
+       			fclose(fp);
        		exit(0);
        		break;
 
@@ -95,24 +100,19 @@ void signal_handler(int signal)
 
 void *f_write(void *arg)
 {
-	//pthread_mutex_lock( &mutex );
 	if(!arg)
 	{
 		printf("\nERR:Invalid Arguments to thread\n");
 		pthread_exit(NULL);
 	}
-	FILE *fp;
+	
 	while(1)
 	{
 		if(flag == WRITE_THREAD)
 		{
 			printf("Current Process ID is %d \n",getpid());
-			printf("\n Entering Write Thread \n");
-			//long d = (long)(arg);
-			//printf("\n Long is %ld\n",d); 
+			printf("\n Entering Write Thread \n"); 
 			struct shared_datastruct *input = (struct shared_datastruct *)arg;
-			//char *temp_buff = malloc(sizeof(char)*1024);
-			//char **new_file = (char **)arg;
 			printf("Enter the contens to be written into the file (To Terminate contents, enter '#' in a new line)\n");
 	  		
 	  		char input_buff;
@@ -143,8 +143,7 @@ void *f_write(void *arg)
 
 void *f_read(void *arg)
 {
-	//pthread_mutex_lock( &mutex );
-	//pthread_cond_wait( & cond, & mutex ); 
+
 	if(!arg)
 	{
 		printf("\nERR:Invalid Arguments to thread\n");
@@ -161,8 +160,7 @@ void *f_read(void *arg)
 			int count_line, count_char, count_word;
 			report->count_line = 0;
 			report->count_char = 0;
-			report->count_word = 0;
-	    	FILE *fp;
+			report->count_word = 0; 
 	  		if(!(fp = fopen(report->filename, "r+"))) 
 	  		{
 	  			printf("\nERR:File open failed\n");
@@ -227,7 +225,6 @@ void *f_report(void *arg)
 
 int main(int argc , char **argv)
 {
-	//char *temp_buff = malloc(sizeof(char)*1024);
 
 	if (argc <= 1)
   	{
@@ -293,7 +290,6 @@ int main(int argc , char **argv)
   		printf("\nERR:Thread Creation Failed!\n");
     	return 1;
   	}
-    //pthread_join(thread_fwrite, NULL);
     
     if(pthread_create(&thread_fread, NULL, &f_read, &report))
     {

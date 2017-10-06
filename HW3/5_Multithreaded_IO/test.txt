@@ -1,1 +1,4 @@
-This is from thread
+Linux is Amazing!
+Process and Threads are definitely differnt!
+pstree is the proof!
+proc is a witness too!

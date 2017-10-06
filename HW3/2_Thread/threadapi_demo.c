@@ -31,7 +31,12 @@ pthread_cond_t cond;
 
 void *rand_input(void *arg)
 {  
-   printf("\nrand_input pthread thread ID : %lu\n", pthread_self());
+   if(!arg)
+   {
+    printf("\nERR:INVALID input argument to thread\n");
+    pthread_exit(NULL);
+   }
+   printf("\nrand_input pthread self ID : %lu\n", pthread_self());
    while(1)
    {
        pthread_mutex_lock(&mutex); 
@@ -77,6 +82,12 @@ void *rand_input(void *arg)
 
 void *ltos_sort(void *arg)
 {
+   if(!arg)
+   {
+
+    printf("\nERR:INVALID input argument to thread\n");
+    pthread_exit(NULL);
+   }
    printf("\nltos_sort pthread self ID : %lu\n", pthread_self());
    while(1)
    {
@@ -100,6 +111,7 @@ void *ltos_sort(void *arg)
 		                 *(input+outer) = *(input+inner); 
 		                 *(input + inner) = temp;
 		               }
+
 		              }
 		            }
 
@@ -207,6 +219,7 @@ int main()
       return 1;
 
     }
+    free(buff);
     return 0;
 
 }

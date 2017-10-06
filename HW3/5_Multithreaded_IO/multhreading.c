@@ -4,7 +4,8 @@
 *                        
 * File Author Name:    Bhallaji Venkatesan 
 * Tools used      :    gcc, gedit
-* References      :    
+* References      :    https://beginnersbook.com/2014/01/c-file-io/
+*				  :	   http://aspyct.org/blog/2012/08/25/unix-signal-handling-example/
 *
 *
 */
@@ -81,9 +82,6 @@ void signal_handler(int signal)
         	break;
        	case SIGINT:
        		printf("\ncoming here\n");
-       		//pthread_kill(thread_fwrite, NULL);
-       		//pthread_kill(thread_fread, NULL);
-       		//pthread_kill(thread_report,NULL);
        		exit(0);
        		break;
 

@@ -4,7 +4,7 @@
 *                        
 * File Author Name:    Bhallaji Venkatesan 
 * Tools used      :    gcc, gedit
-* References      :    
+* References      :    https://stackoverflow.com/questions/23417442/how-to-match-string-to-execvp-in-c
 *
 *
 */
@@ -23,13 +23,8 @@ int main(int argc , char **argv)
 	clock_t end_time = 0;
 	end_time = clock();
 	printf("\nEntering Child Process\n");
-	printf("\n Argument is %s\n",argv[1]);
-	double argument = atof(argv[1]);
-	printf("\nStart time of clock is %lu\n",argument);
-	printf("\nEnd time of clock is %lu\n",end_time);
-
-	printf("\n Fork Exec Profiling time is  %lf",(end_time -argument)/CLOCKS_PER_SEC);
-
-
+	long int argument = atoi(argv[1]);
+	printf("\nStart time of clock in parent is %lu CPU Clocks\n",argument);
+	printf("\nClocks used by child process to startup after exec is  %lu CPU Clocks\n",end_time);
 	return 0;
 }

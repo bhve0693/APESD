@@ -1,14 +1,14 @@
 /*
 * FileName        :    threadapi_demo.c
 * Description     :    This file contains implementation that uses create, join, exit,
-					   self, getattr, getattr_default, setattr, mutex_init, mutex_destroy, 
-			           mutex_lock, mutex_trylock,cond_init, cond_signal, cond_wait 
-			           and cond_destroy api's of pthreads to generate a random input
-			           buffer, and sort it. 
+					             self, getattr, getattr_default, setattr, mutex_init, mutex_destroy, 
+			                 mutex_lock, mutex_trylock,cond_init, cond_signal, cond_wait 
+			                 and cond_destroy api's of pthreads to generate a random input
+			                 buffer, and sort it. 
 *                        
 * File Author Name:    Bhallaji Venkatesan 
 * Tools used      :    gcc, gedit
-* References      :    
+* References      :    man pages
 *
 *
 */
@@ -49,7 +49,7 @@ void *rand_input(void *arg)
            for (i=0;i<size;i++)
              *(input+i) = rand()%size; 
 
-          printf("\n Input Buffer\n");
+          printf("\nInput Buffer\n");
           for(i = 0 ;i<size-1;i++)
           {
             printf("%d,",*(input+i));
@@ -62,10 +62,9 @@ void *rand_input(void *arg)
              { 
                pthread_cond_signal(&cond);
                 
-                thread_status = 1;
+               thread_status = 1;
                  
-                pthread_mutex_unlock(&mutex);
-               // sleep(3);
+               pthread_mutex_unlock(&mutex);
              }
            }
            break;
@@ -78,7 +77,7 @@ void *rand_input(void *arg)
 
 void *ltos_sort(void *arg)
 {
-   printf("\nltos_sort pthread thread ID : %lu\n", pthread_self());
+   printf("\nltos_sort pthread self ID : %lu\n", pthread_self());
    while(1)
    {
 
@@ -87,16 +86,10 @@ void *ltos_sort(void *arg)
 		        pthread_cond_wait( &cond, &mutex);
 		        if(thread_status)
 		        {
-		       
-		          // pthread_cond_wait( & cond, & mutex );
-		           printf("\n Entering sorting Thread\n");
 		           int outer,inner,temp = 0;
 		           int size = 50;
 		           int i =0;
 		           int *input = (int *)arg;
-		           printf("\n Input Buffer in sorting thread\n");
-		           for (i=0;i<size;i++)
-		             printf("%d,",*(input+i));
 		           for(outer =0;outer<size;outer++)
 		           {
 		             for(inner = outer+1;inner<=size;inner++)
@@ -109,9 +102,7 @@ void *ltos_sort(void *arg)
 		               }
 		              }
 		            }
-		            printf("\n Input Buffer after sorting \n");
-		            for (i=0;i<size;i++)
-		            printf("%d,",*(input+i));
+
 		            pthread_mutex_unlock(&mutex);
 		            break;
 		        }
@@ -125,52 +116,97 @@ void *ltos_sort(void *arg)
 
 int main()
 {
-  //Thread 1 
-  //pthread create 
-  //pthread exit 
-// Random Input Generation in an array
-// Condition Thread 2 after array generation
-  int i =0;
-  int result = 0;
-  long long stacksize=0;
-  int *buffer = malloc(100*sizeof(int));
-  if(!buffer)
-  {
-    printf("\n Malloc Failed \n");
-    exit(0);
-  }
-  pthread_t rinput_thread,sort_thread;
-  pthread_attr_t attr;
-  printf("Enter stack size(greate than or equal to 0:)");
-  scanf("%lld",&stacksize);
-  if(stacksize>=0)
-  {
-    result = pthread_attr_setstacksize(&attr,stacksize);
-    if(result) printf("Error in setting stack size\n");
-  }
-  pthread_mutex_init(&mutex,NULL);
-  pthread_cond_init(&cond,NULL);
-  //pthread_attr_init(&attr);
-  pthread_getattr_default_np(&attr);
- // pthread_setattr_np(&attr);
-  pthread_create(&rinput_thread,&attr, &rand_input,(void *)buffer);
-  pthread_create(&sort_thread, &attr, &ltos_sort, (void *)buffer);
-  result = pthread_getattr_np(rinput_thread,&attr);
-  printf("\n Result of getattr %d \n");
-  pthread_join(rinput_thread, NULL);
-  pthread_join(sort_thread, NULL);
-  
-  printf("\nSorted buffer\n");
-  for(i = 0; i<50; i++)
-  {
-    printf("%d,",*(buffer+i));
-  }
+    int i =0;
+    int result = 0;
+    long long stacksize=0;
+    int *buffer = malloc(100*sizeof(int));
+    if(!buffer)
+    {
+      printf("\n Malloc Failed \n");
+      exit(0);
+    }
+    pthread_t rinput_thread,sort_thread;
+    pthread_attr_t attr;
+    printf("Enter stack size(greate than or equal to 0:)");
+    scanf("%lld",&stacksize);
+    if(stacksize>=0)
+    {
+      result = pthread_attr_setstacksize(&attr,stacksize);
+      if(!result) printf("ERR:In setting stack size\n");
+    }
+    else
+    {
+      printf("\nERR:INVALID STACK SIZE! Exiting!\n");
+      exit(0);
+    }
 
-  pthread_exit(NULL);
-  pthread_mutex_destroy(&mutex);
-  pthread_cond_destroy(&cond);
-  //Thread 2
-  // Wait on condition for input array creation 
-  //Perform sort 
+    if(pthread_mutex_init(&mutex,NULL) != 0)
+    {
+      printf("\nERR:Mutex Init Failed!\n");
+      return 1;
+    }
+    if(pthread_cond_init(&cond,NULL) != 0)
+    {
+      printf("\nERR:Condition Init Failed!\n");
+      return 1;
+    }
+
+    if(pthread_getattr_default_np(&attr) !=0)
+    {
+       printf("\nERR:get attribute default Failed!\n");
+       return 1;
+
+    }
+    if(pthread_create(&rinput_thread,&attr, &rand_input,(void *)buffer) != 0)
+    {
+      printf("\nERR:Thread Creation Failed!\n");
+      return 1;
+    }
+    if(pthread_create(&sort_thread, &attr, &ltos_sort, (void *)buffer) != 0)
+    {
+      printf("\nERR:Thread Creation Failed!\n");
+      return 1;
+    }
+    if(result = pthread_getattr_np(rinput_thread,&attr) != 0)
+    {
+      printf("\nERR:get attribute  Failed!\n");
+       return 1;
+    }
+    printf("\n Result of successfull getattr %d\n");
+
+    if(pthread_join(rinput_thread, NULL) != 0)
+    { 
+      printf("\nERR:Thread Joining Failed!\n");
+      return 1;
+    }
+
+    if(pthread_join(sort_thread, NULL) != 0)
+    { 
+      printf("\nERR:Thread Joining Failed!\n");
+      return 1;
+    }
+
+    
+    printf("\n\nSorted buffer\n");
+    for(i = 0; i<50; i++)
+    {
+      printf("%d,",*(buffer+i));
+    }
+    printf("\n");
+
+    pthread_exit(NULL);
+    if(pthread_mutex_destroy(&mutex) != 0)
+    {
+      printf("\nERR:Mutex destroy Failed!\n");
+      return 1;
+
+    }
+    if(pthread_cond_destroy(&cond) !=0)
+    {
+      printf("\nERR:Condition destroy Failed!\n");
+      return 1;
+
+    }
+    return 0;
 
 }

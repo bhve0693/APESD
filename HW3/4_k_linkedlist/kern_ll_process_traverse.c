@@ -4,7 +4,7 @@
 *                        
 * File Author Name:    Bhallaji Venkatesan 
 * Tools used      :    gcc, gedit
-* References      :    
+* References      :    https://isis.poly.edu/kulesh/stuff/src/klist/
 *
 *
 */
@@ -50,7 +50,7 @@ static int __init kernmod_init(void)
       printk(KERN_ALERT "My current process PID is : %d \n", temp->pid);
 		  printk(KERN_ALERT "My current State  : %ld \n", temp->state);
 		  printk(KERN_ALERT "My current process name  : %s \n", temp->comm); 
-		  printk(KERN_ALERT "My current Thread ID  : %d \n", temp->tgid);
+		  printk(KERN_ALERT "My current Thread Group ID  : %d \n", temp->tgid);
       printk(KERN_ALERT "No. of Children of this process : %d \n", count_child);
       printk(KERN_ALERT "No. of Siblings for this process : %d \n", count_sibling);
       count_child = 0;
@@ -58,34 +58,7 @@ static int __init kernmod_init(void)
       temp = temp->parent; 
        
   }
-    /*printk(KERN_ALERT "\nLooking for Kernel Thread.\n"); 
-    for_each_process(mycurrent)
-    {
-        //if(strcmp(mycurrent->comm,"kthreadd"))
-        struct task_struct *temp_task;
-        if(mycurrent->pid == 2)
-        {
-          
-              printk(KERN_ALERT "My Parent's process PID is : %d \n",task_ppid_nr(mycurrent));
-              printk("My current process name  : %s \n", mycurrent->comm);
-              list_for_each(list_new, &mycurrent->children)
-              {
-                  temp_task = list_entry(list_new, struct task_struct, children);
-              
 
-                printk(KERN_ALERT "My Child's Thread ID is : %d \n", temp_task->parent->tgid);
-                printk(KERN_ALERT "My Child's name is : %s \n", temp_task->parent->comm);
-                printk(KERN_ALERT "My Child's process PID is : %d \n", temp_task->parent->pid);
-
-                  i++;
-              }
-        }
-    }
-
-
-   // k = get_nr_threads(current->parent->parent);
-   // printk(KERN_ALERT "Number of Threads %d\n",k);
-    printk(KERN_ALERT "Done with i %lld\n",i);*/
   return 0;
 }
 

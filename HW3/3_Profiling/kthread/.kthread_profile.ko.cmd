@@ -1,0 +1,1 @@
+cmd_/home/bhallaji/APESD/HW3/3_Profiling/kthread/kthread_profile.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/bhallaji/APESD/HW3/3_Profiling/kthread/kthread_profile.ko /home/bhallaji/APESD/HW3/3_Profiling/kthread/kthread_profile.o /home/bhallaji/APESD/HW3/3_Profiling/kthread/kthread_profile.mod.o ;  true

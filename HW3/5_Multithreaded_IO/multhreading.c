@@ -79,6 +79,15 @@ void signal_handler(int signal)
        			printf("\n SIGUSR1 not yet received! Report not Ready!\n");
        		}
         	break;
+       	case SIGINT:
+       		printf("\ncoming here\n");
+       		//pthread_kill(thread_fwrite, NULL);
+       		//pthread_kill(thread_fread, NULL);
+       		//pthread_kill(thread_report,NULL);
+       		exit(0);
+       		break;
+
+
         default:
         	//Do Nothing
         	break;
@@ -107,10 +116,6 @@ void *f_write(void *arg)
 			//char *temp_buff = malloc(sizeof(char)*1024);
 			//char **new_file = (char **)arg;
 			printf("Enter the contens to be written into the file (To Terminate contents, enter '#' in a new line)\n");
-	    	//fgets(temp_buff, 1024*sizeof(char),stdin);
-	    	//printf("\n temp buff is %s \n", temp_buff);
-	    	//printf("strlen is %d", strlen(temp_buff));
-	    	//printf("Size of tempbuff is %ld and size of char is %ld\n", sizeof(temp_buff), sizeof(char));
 	  		
 	  		char input_buff;
 	  		if(!(fp = fopen(input->filename, "w+")))
@@ -122,12 +127,7 @@ void *f_write(void *arg)
 	  		{
 	  			fputc(input_buff, fp);
 	  		}
-	  		//fwrite(temp_buff, 1, strlen(temp_buff)*sizeof(char),fp);
 
-	  		/*for(int i = 2; i<argc; i++)
-	  		{
-	  			fwrite(argv[i], 1, sizeof(argv[i])*sizeof(char),fp);
-		    }*/
 	    	fclose(fp);
 
 	   		break;
@@ -140,7 +140,6 @@ void *f_write(void *arg)
 	}	
 	sig_status = MAIN_THREAD_PROCESSING_DONE;
     return NULL;
-  //  pthread_exit(NULL);
 
 }//Exiting f_write Thread
 
@@ -231,6 +230,7 @@ void *f_report(void *arg)
 int main(int argc , char **argv)
 {
 	//char *temp_buff = malloc(sizeof(char)*1024);
+
 	if (argc <= 1)
   	{
     	printf ("USAGE:  <Filename> \n");
@@ -278,7 +278,17 @@ int main(int argc , char **argv)
     	return 1;
     }
 
-  	pthread_attr_init(&attr);
+    if(sigaction(SIGINT, &custom_signal, NULL) == -1)
+    {
+    	printf("\nERR:Cannot Handle SIGINT!\n");
+    	return 1;
+    }
+
+  	if(pthread_attr_init(&attr))
+  	{
+  		printf("\nERR:Thread attribute initialization Failed!\n");
+    	return 1;
+  	}
 
   	if(pthread_create(&thread_fwrite, NULL, &f_write, &report))
   	{

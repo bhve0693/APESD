@@ -36,7 +36,7 @@ static int __init kernmod_init(void)
 	current_thread_info();
   printk(KERN_ALERT "Custom Kernel module installed in the kernel!.\n"); 	
   temp = mycurrent;
-  while(temp->parent != &init_task)
+  while(temp != &init_task)
   {
        
       list_for_each(list, &temp->children)

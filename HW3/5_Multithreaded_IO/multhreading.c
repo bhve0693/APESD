@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
+#include <fcntl.h>
 
 
 /* Macros */
@@ -30,10 +31,13 @@
 #define MAIN_THREAD_PROCESSING_DONE 3
 #define READ_THREAD_WAITING 4
 
-int sig_status = MAIN_THREAD_PROCESSING;
+volatile int sig_status = MAIN_THREAD_PROCESSING;
 
 
 static volatile sig_atomic_t flag = WRITE_THREAD;
+
+
+
 void signal_handler(int signal);
 
 struct shared_datastruct{
@@ -43,7 +47,8 @@ struct shared_datastruct{
 	char *filename;
 };
 
-long file_size = 0;
+volatile long file_size = 0;
+
 FILE *fp = NULL;
 
 void signal_handler(int signal)
@@ -60,7 +65,7 @@ void signal_handler(int signal)
             else if(sig_status == MAIN_THREAD_PROCESSING)
             {
             	sig_status = READ_THREAD_WAITING;
-            	printf("\nWaiting for Write thread to be finished.Press '#' to end write thread and try sending SIGUSR1 at a later point\n");
+            	printf("\n Wrapping up Write thread. Press any key to continue!\n");
             }
             else
             {
@@ -85,11 +90,16 @@ void signal_handler(int signal)
 
        	case SIGINT: 
        		printf("\nReceived SIGINT, proceeding to gracefully exit parent and child!\n");
-       		if(fp != NULL)
-       			fclose(fp);
+    		if(fp != NULL)
+       		fclose(fp);
        		exit(0);
        		break;
-
+       	case SIGTERM:
+       		printf("\nReceived SIGTERM, proceeding to gracefully exit parent and child!\n");
+    		if(fp != NULL)
+       		fclose(fp);
+       		exit(0);
+       		break;       		
 
         default:
         	//Do Nothing
@@ -113,7 +123,7 @@ void *f_write(void *arg)
 			printf("Current Process ID is %d \n",getpid());
 			printf("\n Entering Write Thread \n"); 
 			struct shared_datastruct *input = (struct shared_datastruct *)arg;
-			printf("Enter the contens to be written into the file (To Terminate contents, enter '#' in a new line)\n");
+			printf("Enter the contens to be written into the file (To Terminate contents, Send SIGUSR1 signal and press enter to proceed!)\n");
 	  		
 	  		char input_buff;
 	  		if(!(fp = fopen(input->filename, "w+")))
@@ -121,19 +131,15 @@ void *f_write(void *arg)
 	  			printf("\nERR:File open failed\n");
 	  			pthread_exit(NULL);
 	  		}
-	  		while((input_buff = fgetc(stdin)) != '#')
+	  		//fcntl(0, F_SETFL, O_NONBLOCK);
+	  		while(sig_status != READ_THREAD_WAITING)
 	  		{
+	  			input_buff = fgetc(stdin);
 	  			fputc(input_buff, fp);
 	  		}
-
-	    	fclose(fp);
-
+	  		fclose(fp);
+			flag = READ_THREAD;
 	   		break;
-		}
-		if(sig_status == READ_THREAD_WAITING)
-		{
-			fclose(fp);
-			break;
 		}
 	}	
 	sig_status = MAIN_THREAD_PROCESSING_DONE;
@@ -154,6 +160,7 @@ void *f_read(void *arg)
 	{
 		if(flag == READ_THREAD)
 		{
+			
 			printf("\nEntering Read Thread \n");
 			struct shared_datastruct *report = (struct shared_datastruct *)arg;
 			char ch;
@@ -188,10 +195,12 @@ void *f_read(void *arg)
 		    printf("\nWord Count is %d\n",report->count_word);
 		    printf("\nLine Count is %d\n",report->count_line);
 		    fclose(fp);
+		    sig_status = SIG1_DONE;
 		    break;
 
 		   // pthread_mutex_unlock( & mutex );
 		}
+
 
 	}	    
     return NULL;
@@ -207,6 +216,7 @@ void *f_report(void *arg)
 	}
 	while(1)
 	{
+		
 		if(flag == REPORT_THREAD)
 		{
 			if(sig_status == SIG1_DONE)
@@ -279,6 +289,12 @@ int main(int argc , char **argv)
     	return 1;
     }
 
+    if(sigaction(SIGTERM, &custom_signal, NULL) == -1)
+    {
+    	printf("\nERR:Cannot Handle SIGTERM!\n");
+    	return 1;
+    }
+
   	if(pthread_attr_init(&attr))
   	{
   		printf("\nERR:Thread attribute initialization Failed!\n");
@@ -314,8 +330,7 @@ int main(int argc , char **argv)
     	return 1;
   	}
     //pthread_kill(thread_report, SIGUSR2);
-
-    if(pthread_join(thread_report, NULL) != 0)
+  	if(pthread_join(thread_report, NULL) != 0)
     {	
     	printf("\nERR:Thread Joining Failed!\n");
     	return 1;
